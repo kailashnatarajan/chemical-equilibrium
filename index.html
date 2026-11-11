@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Chemistry Laboratory | Le Chatelier's Principle</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --deep-blue: #1a237e;
+    --blue-mid: #283593;
+    --teal: #00897b;
+    --teal-light: #4db6ac;
+    --amber: #ffa000;
+    --amber-light: #ffca28;
+    --bg: #f0f4f8;
+    --card: #ffffff;
+    --text: #263238;
+    --text-light: #546e7a;
+    --border: #e0e7ef;
+    --success: #2e7d32;
+    --danger: #c62828;
+    --warning: #e65100;
+    --shadow: 0 4px 24px rgba(26,35,126,0.10);
+    --shadow-hover: 0 8px 32px rgba(26,35,126,0.18);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--deep-blue) 0%, #0288d1 50%, var(--teal) 100%);
+    color: #fff;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 32px 12px;
+  }
+  .header-icon {
+    font-size: 2.6rem;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+  }
+  .header-titles h1 {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+  .header-titles p {
+    font-size: 0.82rem;
+    opacity: 0.85;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+  }
+  .badge-row {
+    display: flex;
+    gap: 8px;
+    padding: 0 32px 10px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: rgba(255,255,255,0.10);
+    display: flex;
+    gap: 0;
+    padding: 0 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.78);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 10px 18px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+  .nav-btn.active {
+    color: #fff;
+    border-bottom: 3px solid var(--amber);
+    background: rgba(255,255,255,0.12);
+    font-weight: 700;
+  }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    padding: 28px 20px;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.25s;
+  }
+  .card:hover { box-shadow: var(--shadow-hover); }
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--deep-blue);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid var(--bg);
+    padding-bottom: 10px;
+  }
+  .card-title span.icon { font-size: 1.3rem; }
+
+  /* ── HOME TAB ── */
+  .hero-banner {
+    background: linear-gradient(135deg, var(--deep-blue), var(--teal));
+    color: #fff;
+    border-radius: 16px;
+    padding: 36px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: var(--shadow);
+  }
+  .hero-banner .hero-icon { font-size: 4rem; flex-shrink: 0; }
+  .hero-banner h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+  .hero-banner p { font-size: 0.88rem; opacity: 0.92; line-height: 1.65; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .info-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 22px;
+    border-left: 5px solid var(--teal);
+    box-shadow: var(--shadow);
+  }
+  .info-card.amber { border-left-color: var(--amber); }
+  .info-card.blue { border-left-color: var(--deep-blue); }
+  .info-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--deep-blue); margin-bottom: 10px; }
+  .info-card p, .info-card ul { font-size: 0.84rem; color: var(--text-light); line-height: 1.65; }
+  .info-card ul { padding-left: 18px; }
+  .info-card li { margin-bottom: 4px; }
+
+  .reaction-box {
+    background: linear-gradient(90deg, #e8eaf6 0%, #e0f2f1 100%);
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    border: 1px solid #c5cae9;
+  }
+  .reaction-box .delta { font-size: 0.85rem; color: var(--teal); font-weight: 500; display: block; margin-top: 6px; }
+
+  .objectives-list { list-style: none; padding: 0; }
+  .objectives-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg);
+    font-size: 0.87rem;
+    color: var(--text);
+  }
+  .objectives-list li:last-child { border-bottom: none; }
+  .objectives-list li::before {
+    content: '✓';
+    background: var(--teal);
+    color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  /* ── PROCEDURE TAB ── */
+  .steps-list { list-style: none; padding: 0; }
+  .step-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--bg);
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    background: linear-gradient(135deg, var(--deep-blue), var(--teal));
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .step-content h4 { font-size: 0.95rem; font-weight: 700; color: var(--deep-blue); margin-bottom: 4px; }
+  .step-content p { font-size: 0.84rem; color: var(--text-light); line-height: 1.6; }
+
+  /* ── SIMULATION TAB ── */
+  .sim-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .sim-layout { grid-template-columns: 1fr; } }
+
+  .controls-panel { display: flex; flex-direction: column; gap: 14px; }
+
+  .control-group {
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 10px;
+  }
+  .control-label .val-badge {
+    background: var(--deep-blue);
+    color: #fff;
+    border-radius: 8px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--teal);
+    cursor: pointer;
+    height: 6px;
+  }
+  .range-minmax {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+
+  .btn {
+    padding: 11px 22px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--deep-blue), var(--teal));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0,137,123,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,137,123,0.4); }
+  .btn-secondary {
+    background: #fff;
+    color: var(--deep-blue);
+    border: 2px solid var(--deep-blue);
+  }
+  .btn-secondary:hover { background: var(--deep-blue); color: #fff; }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .result-card {
+    background: #f8fafd;
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .result-card .r-label { font-size: 0.72rem; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+  .result-card .r-value { font-size: 1.3rem; font-weight: 800; color: var(--deep-blue); margin: 4px 0; }
+  .result-card .r-unit { font-size: 0.72rem; color: var(--text-light); }
+
+  .shift-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-top: 6px;
+  }
+  .shift-right { background: #e0f7fa; color: #006064; border: 2px solid #4dd0e1; }
+  .shift-left  { background: #fce4ec; color: #880e4f; border: 2px solid #f48fb1; }
+  .shift-eq    { background: #f3e5f5; color: #4a148c; border: 2px solid #ce93d8; }
+
+  canvas#molCanvas {
+    width: 100%;
+    border-radius: 14px;
+    background: #0d1b2a;
+    display: block;
+    border: 2px solid #1a2f4a;
+  }
+  .canvas-legend {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-light);
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.4);
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 220px;
+    margin-top: 16px;
+  }
+
+  /* ── OBSERVATIONS TAB ── */
+  .obs-table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+  }
+  thead th {
+    background: linear-gradient(135deg, var(--deep-blue), var(--blue-mid));
+    color: #fff;
+    padding: 12px 14px;
+    text-align: center;
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 0.78rem;
+  }
+  thead th:first-child { border-radius: 10px 0 0 0; }
+  thead th:last-child { border-radius: 0 10px 0 0; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:nth-child(even) { background: #f5f8ff; }
+  tbody tr:hover { background: #e8f5e9; }
+  tbody td {
+    padding: 11px 14px;
+    text-align: center;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .empty-obs {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-light);
+    font-size: 0.88rem;
+  }
+  .obs-shift-R { color: #006064; font-weight: 700; }
+  .obs-shift-L { color: #880e4f; font-weight: 700; }
+
+  /* ── QUIZ TAB ── */
+  .quiz-progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .q-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e7ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-light);
+    transition: all 0.3s;
+  }
+  .q-dot.answered { background: var(--teal); color: #fff; }
+  .q-dot.correct  { background: var(--success); color: #fff; }
+  .q-dot.wrong    { background: var(--danger); color: #fff; }
+
+  .question-card {
+    background: #f8fafd;
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .question-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--deep-blue);
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+  .options-list { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 16px;
+    text-align: left;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--teal); background: #e0f2f1; color: var(--teal); }
+  .option-btn.correct-ans { border-color: var(--success); background: #e8f5e9; color: var(--success); font-weight: 700; }
+  .option-btn.wrong-ans   { border-color: var(--danger);  background: #ffebee; color: var(--danger); font-weight: 700; }
+  .option-btn:disabled { cursor: not-allowed; }
+  .option-label {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--bg); display: flex; align-items: center;
+    justify-content: center; font-size: 0.75rem; font-weight: 700;
+    flex-shrink: 0; border: 2px solid var(--border);
+  }
+  .feedback-text {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback-text.show { display: block; }
+  .feedback-text.correct-fb { background: #e8f5e9; color: var(--success); border: 1px solid #a5d6a7; }
+  .feedback-text.wrong-fb   { background: #ffebee; color: var(--danger); border: 1px solid #ef9a9a; }
+
+  /* ── RESULT TAB ── */
+  .result-hero {
+    text-align: center;
+    padding: 40px 24px;
+  }
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    border: 8px solid;
+    transition: all 0.5s;
+  }
+  .score-circle .score-num { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+  .score-circle .score-denom { font-size: 0.88rem; font-weight: 600; }
+  .result-msg { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+  .result-sub { font-size: 0.88rem; color: var(--text-light); margin-bottom: 24px; }
+
+  .cert-box {
+    background: linear-gradient(135deg, #e8eaf6 0%, #e0f2f1 100%);
+    border: 3px double var(--deep-blue);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 540px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .cert-box h3 { font-size: 1.1rem; font-weight: 800; color: var(--deep-blue); margin-bottom: 6px; }
+  .cert-box p { font-size: 0.85rem; color: var(--text-light); }
+  .cert-line { border-top: 2px solid var(--deep-blue); margin: 16px 40px; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--deep-blue);
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    padding: 16px;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+  }
+  footer strong { color: var(--amber-light); }
+
+  /* ── UTILITIES ── */
+  .text-center { text-align: center; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-16 { margin-bottom: 16px; }
+
+  @media (max-width: 600px) {
+    .header-top { padding: 14px 16px 10px; flex-wrap: wrap; }
+    .header-titles h1 { font-size: 1.1rem; }
+    .badge-row { padding: 0 16px 8px; }
+    main { padding: 16px 10px; }
+    .card { padding: 18px 14px; }
+    .hero-banner { flex-direction: column; text-align: center; padding: 24px 18px; }
+    .results-grid { grid-template-columns: 1fr 1fr; }
+    .nav-btn { padding: 10px 12px; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header>
+  <div class="header-top">
+    <div class="header-icon">⚗️</div>
+    <div class="header-titles">
+      <h1>Virtual Chemistry Laboratory | Le Chatelier's Principle</h1>
+      <p>Department of Chemistry &nbsp;•&nbsp; B.Sc / B.Tech First Year &nbsp;•&nbsp; Chemical Equilibrium Module</p>
+    </div>
+  </div>
+  <div class="badge-row">
+    <span class="badge">🧪 Interactive Simulation</span>
+    <span class="badge">📊 Real-time Charts</span>
+    <span class="badge">🎯 MCQ Assessment</span>
+    <span class="badge">🏆 Certificate</span>
+    <span class="badge">Haber Process – N₂ + 3H₂ ⇌ 2NH₃</span>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="showTab('home',this)">🏠 Introduction</button>
+    <button class="nav-btn" onclick="showTab('procedure',this)">📋 Procedure</button>
+    <button class="nav-btn" onclick="showTab('simulation',this)">🔬 Simulation</button>
+    <button class="nav-btn" onclick="showTab('observations',this)">📝 Observations</button>
+    <button class="nav-btn" onclick="showTab('quiz',this)">❓ Quiz</button>
+    <button class="nav-btn" onclick="showTab('result',this)">🏆 Result</button>
+  </nav>
+</header>
+
+<main>
+<!-- ══════════════ HOME / INTRODUCTION ══════════════ -->
+<div id="tab-home" class="tab-content active">
+  <div class="hero-banner">
+    <div class="hero-icon">⚖️</div>
+    <div>
+      <h2>Chemical Equilibrium &amp; Le Chatelier's Principle</h2>
+      <p>Explore how dynamic equilibrium responds to changes in temperature, pressure, and concentration. This virtual lab lets you manipulate variables in the Haber Process and observe real-time effects on NH₃ yield — a cornerstone of industrial chemistry.</p>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>⚖️ What is Chemical Equilibrium?</h3>
+      <p>Chemical equilibrium is a <strong>dynamic state</strong> in a reversible reaction where the rate of the forward reaction equals the rate of the reverse reaction. At this point, the concentrations of reactants and products remain constant over time — though both reactions continue to occur simultaneously.</p>
+    </div>
+    <div class="info-card amber">
+      <h3>🔄 Le Chatelier's Principle</h3>
+      <p>"<em>If a system at equilibrium is subjected to a change in concentration, temperature, pressure, or volume, the system will shift its equilibrium position to <strong>oppose</strong> that change and establish a new equilibrium.</em>"</p>
+      <p class="mt-8">Proposed by Henri Louis Le Chatelier in 1884.</p>
+    </div>
+    <div class="info-card blue">
+      <h3>📌 Equilibrium Constant (K<sub>c</sub>)</h3>
+      <p>For a reaction aA + bB ⇌ cC + dD:</p>
+      <p style="font-family:monospace;margin-top:8px;font-size:0.82rem;">Kc = [C]ᶜ[D]ᵈ / [A]ᵃ[B]ᵇ</p>
+      <p class="mt-8">Kc depends only on <strong>temperature</strong>. If Q &lt; Kc → forward shift; Q &gt; Kc → reverse shift; Q = Kc → equilibrium.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚗️</span> Reactions Studied</div>
+    <div class="reaction-box">
+      N₂(g) &nbsp;+&nbsp; 3H₂(g) &nbsp;⇌&nbsp; 2NH₃(g)
+      <span class="delta">ΔH = −92 kJ/mol &nbsp;|&nbsp; Exothermic &nbsp;|&nbsp; Haber Process (Industrial NH₃ synthesis)</span>
+    </div>
+    <div class="reaction-box" style="margin-bottom:0;">
+      CO(g) &nbsp;+&nbsp; 3H₂(g) &nbsp;⇌&nbsp; CH₄(g) &nbsp;+&nbsp; H₂O(g)
+      <span class="delta">ΔH = −206 kJ/mol &nbsp;|&nbsp; Exothermic &nbsp;|&nbsp; Methanation Reaction</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🎯</span> Learning Objectives</div>
+    <ul class="objectives-list">
+      <li>Understand the concept of dynamic chemical equilibrium and its characteristics.</li>
+      <li>State and apply Le Chatelier's Principle to predict shifts in equilibrium.</li>
+      <li>Explain the effect of temperature changes on exothermic and endothermic reactions.</li>
+      <li>Analyze the effect of pressure changes on equilibria involving gases.</li>
+      <li>Evaluate the effect of concentration changes on the equilibrium position.</li>
+      <li>Calculate the equilibrium constant Kc using the Van't Hoff equation.</li>
+      <li>Determine the NH₃ yield % using ICE table methodology.</li>
+      <li>Relate Le Chatelier's Principle to the industrial optimization of the Haber Process.</li>
+    </ul>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>🌡️ Effect of Temperature</h3>
+      <ul>
+        <li>Exothermic reaction: ↑T → shift left (less product)</li>
+        <li>Exothermic reaction: ↓T → shift right (more product)</li>
+        <li>Endothermic reaction: ↑T → shift right (more product)</li>
+        <li>Temperature changes Kc value</li>
+      </ul>
+    </div>
+    <div class="info-card amber">
+      <h3>🔧 Effect of Pressure</h3>
+      <ul>
+        <li>↑Pressure → shifts to side with fewer gas moles</li>
+        <li>↓Pressure → shifts to side with more gas moles</li>
+        <li>N₂ + 3H₂ → 2NH₃: 4 moles → 2 moles</li>
+        <li>↑P favors NH₃ formation (product side)</li>
+      </ul>
+    </div>
+    <div class="info-card blue">
+      <h3>⚗️ Effect of Concentration</h3>
+      <ul>
+        <li>↑[reactant] → shifts forward (more product)</li>
+        <li>↑[product] → shifts backward (more reactant)</li>
+        <li>Catalyst: speeds up both reactions equally</li>
+        <li>Catalyst does NOT shift equilibrium</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROCEDURE ══════════════ -->
+<div id="tab-procedure" class="tab-content">
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span> Step-by-Step Procedure</div>
+    <ul class="steps-list">
+      <li class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>🏠 Read the Introduction</h4>
+          <p>Navigate to the <strong>Introduction</strong> tab and thoroughly read the concept of Chemical Equilibrium, Le Chatelier's Principle, and the Haber Process reaction. Understand the learning objectives before proceeding to the simulation.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>🔬 Open the Simulation Tab</h4>
+          <p>Click on the <strong>Simulation</strong> tab in the navigation bar. You will see the control panel on the left and the visualization area on the right. The canvas shows animated molecules and the chart shows NH₃ yield vs Temperature.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>🌡️ Set Initial Conditions</h4>
+          <p>Use the <strong>Temperature slider</strong> (100–600°C) to set your starting temperature. The default is 400°C (industrial Haber Process condition). Note the displayed Kc value and NH₃ yield % that update automatically.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>🔧 Adjust Pressure</h4>
+          <p>Move the <strong>Pressure slider</strong> (1–300 atm). Higher pressures favor NH₃ production since the reaction reduces gas moles (4 → 2). Watch the yield % change and the chart update in real time.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>⚗️ Adjust Concentrations</h4>
+          <p>Use the <strong>[N₂] slider</strong> and <strong>[H₂] slider</strong> (0.1–5.0 mol/L) to vary initial reactant concentrations. Observe how changing these values shifts the equilibrium direction and alters the reaction quotient Q relative to Kc.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>📊 Observe the Canvas &amp; Chart</h4>
+          <p>Watch the <strong>animated molecule canvas</strong> — blue circles (N₂), light-blue circles (H₂), and orange circles (NH₃) represent molecule counts at equilibrium. The <strong>line chart</strong> shows how NH₃ yield % varies across all temperatures at the current pressure.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h4>✅ Apply Change &amp; Record</h4>
+          <p>Click the <strong>"Apply Change"</strong> button to record the current conditions in the Observations table. Try at least 5 different combinations (vary T, P, and concentrations) to build a complete data set.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <h4>📝 Review Observations</h4>
+          <p>Navigate to the <strong>Observations</strong> tab to see your recorded data table. Analyze trends: How does increasing temperature affect Kc? How does increasing pressure affect yield? Can you identify the optimal industrial conditions?</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">9</div>
+        <div class="step-content">
+          <h4>❓ Attempt the Quiz</h4>
+          <p>Go to the <strong>Quiz</strong> tab and answer all 5 MCQ questions. Each question tests your understanding of Le Chatelier's Principle. Click an option to submit — you'll receive instant feedback after each answer.</p>
+        </div>
+      </li>
+      <li class="step-item">
+        <div class="step-num">10</div>
+        <div class="step-content">
+          <h4>🏆 View Your Result</h4>
+          <p>Navigate to the <strong>Result</strong> tab to see your final score and performance message. A score of 4–5 earns a <em>Pass with Distinction</em>, 3 earns a <em>Pass</em>, and below 3 is an <em>Attempt Again</em> recommendation. Reset and retry as needed.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="icon">⚠️</span> Safety &amp; Lab Precautions (Real Lab Context)</div>
+    <div class="info-grid" style="margin-bottom:0;">
+      <div class="info-card"><h3>🧯 Hazard Awareness</h3><ul><li>NH₃ gas is toxic and corrosive</li><li>H₂ gas is highly flammable</li><li>High pressure equipment requires proper handling</li></ul></div>
+      <div class="info-card amber"><h3>🥼 Protective Equipment</h3><ul><li>Always wear safety goggles</li><li>Use fume hood for NH₃ experiments</li><li>Wear heat-resistant gloves at high temperatures</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SIMULATION ══════════════ -->
+<div id="tab-simulation" class="tab-content">
+  <div class="sim-layout">
+    <!-- Controls -->
+    <div class="controls-panel">
+      <div class="card" style="margin-bottom:0;padding:20px;">
+        <div class="card-title"><span class="icon">🎛️</span> Controls</div>
+
+        <div class="control-group">
+          <div class="control-label">🌡️ Temperature <span class="val-badge" id="tempVal">400 °C</span></div>
+          <input type="range" id="tempSlider" min="100" max="600" value="400" step="5" oninput="updateSim()">
+          <div class="range-minmax"><span>100°C</span><span>600°C</span></div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">🔧 Pressure <span class="val-badge" id="pressVal">150 atm</span></div>
+          <input type="range" id="pressSlider" min="1" max="300" value="150" step="1" oninput="updateSim()">
+          <div class="range-minmax"><span>1 atm</span><span>300 atm</span></div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">[N₂] Conc. <span class="val-badge" id="n2Val">1.0 mol/L</span></div>
+          <input type="range" id="n2Slider" min="0.1" max="5.0" value="1.0" step="0.1" oninput="updateSim()">
+          <div class="range-minmax"><span>0.1</span><span>5.0 mol/L</span></div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">[H₂] Conc. <span class="val-badge" id="h2Val">3.0 mol/L</span></div>
+          <input type="range" id="h2Slider" min="0.1" max="5.0" value="3.0" step="0.1" oninput="updateSim()">
+          <div class="range-minmax"><span>0.1</span><span>5.0 mol/L</span></div>
+        </div>
+
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn btn-primary" onclick="applyChange()">✅ Apply Change</button>
+          <button class="btn btn-secondary" onclick="resetSim()">🔄 Reset</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="card" style="margin-bottom:0;padding:20px;">
+        <div class="card-title"><span class="icon">📊</span> Results</div>
+        <div class="results-grid">
+          <div class="result-card">
+            <div class="r-label">Kc Value</div>
+            <div class="r-value" id="kcDisplay">—</div>
+            <div class="r-unit">L²/mol²</div>
+          </div>
+          <div class="result-card">
+            <div class="r-label">NH₃ Yield %</div>
+            <div class="r-value" id="yieldDisplay">—</div>
+            <div class="r-unit">%</div>
+          </div>
+          <div class="result-card">
+            <div class="r-label">Q (Reaction Quotient)</div>
+            <div class="r-value" id="qDisplay">—</div>
+            <div class="r-unit">L²/mol²</div>
+          </div>
+          <div class="result-card">
+            <div class="r-label">NH₃ at Eq.</div>
+            <div class="r-value" id="nh3Display">—</div>
+            <div class="r-unit">mol/L</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;">
+          <div class="r-label" style="margin-bottom:6px;">Equilibrium Shift Direction</div>
+          <div id="shiftBadge" class="shift-badge shift-eq">⇌ At Equilibrium</div>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:#f8fafd;border-radius:10px;font-size:0.78rem;color:var(--text-light);">
+          <strong style="color:var(--deep-blue);">Q vs Kc:</strong> <span id="qVsKc">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visualizations -->
+    <div>
+      <div class="card" style="margin-bottom:16px;padding:20px;">
+        <div class="card-title"><span class="icon">🔵</span> Molecule Visualization (Canvas)</div>
+        <canvas id="molCanvas" height="200"></canvas>
+        <div class="canvas-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#4fc3f7;"></div>N₂ (Nitrogen)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#b3e5fc;"></div>H₂ (Hydrogen)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#ffb300;"></div>NH₃ (Ammonia)</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px;">
+        <div class="card-title"><span class="icon">📈</span> NH₃ Yield % vs Temperature (at current Pressure)</div>
+        <div class="chart-wrap">
+          <canvas id="yieldChart"></canvas>
+        </div>
+        <p style="font-size:0.75rem;color:var(--text-light);margin-top:8px;text-align:center;">Chart updates when Pressure slider changes. Lower temperature → higher yield (exothermic).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ OBSERVATIONS ══════════════ -->
+<div id="tab-observations" class="tab-content">
+  <div class="card">
+    <div class="card-title"><span class="icon">📝</span> Observation Table</div>
+    <p style="font-size:0.83rem;color:var(--text-light);margin-bottom:16px;">Click <strong>"Apply Change"</strong> in the Simulation tab to record observations. Analyze the effect of each variable below.</p>
+    <div class="obs-table-wrap">
+      <table id="obsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Temp (°C)</th>
+            <th>Pressure (atm)</th>
+            <th>[N₂] (mol/L)</th>
+            <th>[H₂] (mol/L)</th>
+            <th>Kc (L²/mol²)</th>
+            <th>NH₃ Yield %</th>
+            <th>[NH₃] eq (mol/L)</th>
+            <th>Shift Direction</th>
+          </tr>
+        </thead>
+        <tbody id="obsBody">
+          <tr><td colspan="9" class="empty-obs">🔬 No observations yet. Go to <strong>Simulation</strong> and click <strong>Apply Change</strong>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-secondary" onclick="clearObs()">🗑️ Clear Table</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">💡</span> Analysis Questions</div>
+    <ol style="padding-left:20px;font-size:0.87rem;color:var(--text);line-height:2;">
+      <li>How does increasing temperature affect Kc for this exothermic reaction?</li>
+      <li>At what temperature range is the NH₃ yield highest? Why is this industrially impractical?</li>
+      <li>How does increasing pressure from 1 atm to 300 atm affect the NH₃ yield %?</li>
+      <li>When [N₂] is increased, in which direction does the equilibrium shift? Why?</li>
+      <li>Compare the equilibrium shifts for Q &lt; Kc vs Q &gt; Kc cases in your table.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ ══════════════ -->
+<div id="tab-quiz" class="tab-content">
+  <div class="card">
+    <div class="card-title"><span class="icon">❓</span> MCQ Quiz — Le Chatelier's Principle</div>
+    <p style="font-size:0.83rem;color:var(--text-light);margin-bottom:16px;">Answer all 5 questions. Click an option to submit. Instant feedback is provided after each answer.</p>
+
+    <div class="quiz-progress">
+      <div class="q-dot" id="qdot-0">1</div>
+      <div class="q-dot" id="qdot-1">2</div>
+      <div class="q-dot" id="qdot-2">3</div>
+      <div class="q-dot" id="qdot-3">4</div>
+      <div class="q-dot" id="qdot-4">5</div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-card" id="qcard-0">
+      <div class="question-text">Q1. If we <strong>increase temperature</strong> in an exothermic equilibrium reaction, the equilibrium shifts...</div>
+      <div class="options-list">
+        <button class="option-btn" onclick="answerQ(0,0,0)"><span class="option-label">A</span> To the left (reverse direction)</button>
+        <button class="option-btn" onclick="answerQ(0,1,0)"><span class="option-label">B</span> To the right (forward direction)</button>
+        <button class="option-btn" onclick="answerQ(0,2,0)"><span class="option-label">C</span> No change occurs</button>
+        <button class="option-btn" onclick="answerQ(0,3,0)"><span class="option-label">D</span> Forward, then backward</button>
+      </div>
+      <div class="feedback-text" id="fb-0"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card" id="qcard-1">
+      <div class="question-text">Q2. Le Chatelier's Principle states that...</div>
+      <div class="options-list">
+        <button class="option-btn" onclick="answerQ(1,0,2)"><span class="option-label">A</span> Equilibrium favors the formation of products at all times</button>
+        <button class="option-btn" onclick="answerQ(1,1,2)"><span class="option-label">B</span> Temperature has no effect on equilibrium</button>
+        <button class="option-btn" onclick="answerQ(1,2,2)"><span class="option-label">C</span> If a system at equilibrium is subjected to a change, it will shift to oppose that change</button>
+        <button class="option-btn" onclick="answerQ(1,3,2)"><span class="option-label">D</span> Equilibrium shifts only when concentration changes</button>
+      </div>
+      <div class="feedback-text" id="fb-1"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card" id="qcard-2">
+      <div class="question-text">Q3. In N₂(g) + 3H₂(g) ⇌ 2NH₃(g), <strong>increasing pressure</strong> favors...</div>
+      <div class="options-list">
+        <button class="option-btn" onclick="answerQ(2,0,0)"><span class="option-label">A</span> Products (NH₃ formation) — forward shift</button>
+        <button class="option-btn" onclick="answerQ(2,1,0)"><span class="option-label">B</span> Reactants (N₂ and H₂ formation) — reverse shift</button>
+        <button class="option-btn" onclick="answerQ(2,2,0)"><span class="option-label">C</span> No change in equilibrium position</button>
+        <button class="option-btn" onclick="answerQ(2,3,0)"><span class="option-label">D</span> Depends on the temperature only</button>
+      </div>
+      <div class="feedback-text" id="fb-2"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card" id="qcard-3">
+      <div class="question-text">Q4. If the concentration of N₂ is <strong>increased</strong> at equilibrium in the Haber Process reaction, the reaction shifts...</div>
+      <div class="options-list">
+        <button class="option-btn" onclick="answerQ(3,0,0)"><span class="option-label">A</span> Forward (to the right) — more NH₃ is produced</button>
+        <button class="option-btn" onclick="answerQ(3,1,0)"><span class="option-label">B</span> Backward (to the left) — NH₃ decomposes</button>
+        <button class="option-btn" onclick="answerQ(3,2,0)"><span class="option-label">C</span> No shift occurs</button>
+        <button class="option-btn" onclick="answerQ(3,3,0)"><span class="option-label">D</span> Depends on temperature and pressure</button>
+      </div>
+      <div class="feedback-text" id="fb-3"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card" id="qcard-4">
+      <div class="question-text">Q5. The <strong>unit of Kc</strong> for the reaction N₂(g) + 3H₂(g) ⇌ 2NH₃(g) is...</div>
+      <div class="options-list">
+        <button class="option-btn" onclick="answerQ(4,0,2)"><span class="option-label">A</span> mol/L (M)</button>
+        <button class="option-btn" onclick="answerQ(4,1,2)"><span class="option-label">B</span> L/mol (M⁻¹)</button>
+        <button class="option-btn" onclick="answerQ(4,2,2)"><span class="option-label">C</span> L²/mol² (M⁻²)</button>
+        <button class="option-btn" onclick="answerQ(4,3,2)"><span class="option-label">D</span> Dimensionless</button>
+      </div>
+      <div class="feedback-text" id="fb-4"></div>
+    </div>
+
+    <div style="margin-top:16px;text-align:center;">
+      <button class="btn btn-primary" onclick="showTab('result', document.querySelector('.nav-btn:last-child'))">🏆 View My Result</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ RESULT ══════════════ -->
+<div id="tab-result" class="tab-content">
+  <div class="card">
+    <div class="result-hero">
+      <div class="score-circle" id="scoreCircle">
+        <span class="score-num" id="scoreNum">—</span>
+        <span class="score-denom">/ 5</span>
+      </div>
+      <div class="result-msg" id="resultMsg">Complete the quiz first!</div>
+      <div class="result-sub" id="resultSub">Navigate to the Quiz tab and answer all 5 questions.</div>
+
+      <div class="cert-box" id="certBox" style="display:none;">
+        <div style="font-size:2.5rem;margin-bottom:10px;">🏆</div>
+        <h3>Certificate of Completion</h3>
+        <p style="font-size:0.8rem;margin-top:4px;">Virtual Chemistry Laboratory</p>
+        <div class="cert-line"></div>
+        <p style="font-size:0.9rem;color:var(--text);font-weight:600;">Successfully completed the module on</p>
+        <p style="font-size:1rem;color:var(--deep-blue);font-weight:800;margin:6px 0;">Chemical Equilibrium &amp; Le Chatelier's Principle</p>
+        <div class="cert-line"></div>
+        <p style="font-size:0.78rem;color:var(--text-light);">Score: <span id="certScore">—</span> / 5 &nbsp;•&nbsp; Haber Process Simulation</p>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:4px;">Department of Chemistry — B.Sc / B.Tech First Year</p>
+      </div>
+
+      <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="showTab('quiz', document.querySelectorAll('.nav-btn')[4])">🔁 Retry Quiz</button>
+        <button class="btn btn-secondary" onclick="resetQuiz()">🗑️ Reset All Answers</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📚</span> Key Takeaways</div>
+    <ul class="objectives-list">
+      <li>Le Chatelier's Principle allows us to predict equilibrium shifts when conditions change.</li>
+      <li>For the exothermic Haber Process, low temperature favors NH₃ but is kinetically too slow industrially.</li>
+      <li>High pressure (150–200 atm) is used industrially to maximize NH₃ yield per pass.</li>
+      <li>Kc depends only on temperature — increasing T decreases Kc for exothermic reactions.</li>
+      <li>The comparison of Q vs Kc determines the direction of spontaneous equilibrium shift.</li>
+      <li>A catalyst (iron with promoters) is used to speed equilibrium attainment without shifting it.</li>
+    </ul>
+  </div>
+</div>
+</main>
+
+<footer>
+  <strong>Developed for Academic Purpose</strong> &nbsp;|&nbsp; Chemistry Virtual Lab &nbsp;|&nbsp;
+  Chemical Equilibrium &amp; Le Chatelier's Principle &nbsp;|&nbsp;
+  B.Sc / B.Tech First Year &nbsp;|&nbsp; &copy; 2025
+</footer>
+
+<!-- ══════════════ JAVASCRIPT ══════════════ -->
+<script>
+// ─── TAB SYSTEM ───────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'simulation') {
+    setTimeout(() => { resizeCanvas(); updateSim(); }, 100);
+  }
+  if (id === 'result') updateResult();
+}
+
+// ─── CHEMISTRY ENGINE ─────────────────────────────────────────
+const R = 8.314;
+const dH = -92000; // J/mol
+const dS = -198;   // J/mol/K
+
+function calcKc(tempC) {
+  const T = tempC + 273.15;
+  const lnK = -dH / (R * T) + dS / R;
+  return Math.exp(lnK);
+}
+
+// ICE table for N2 + 3H2 <-> 2NH3
+// Kc = [NH3]^2 / ([N2][H2]^3)
+// Solve: let x = extent of reaction (moles NH3 formed / 2)
+// [N2] = a - x, [H2] = b - 3x, [NH3] = 2x
+// Kc = (2x)^2 / ((a-x)(b-3x)^3)
+// Solve numerically via bisection
+function calcEquilibrium(Kc, a, b) {
+  // Clamp x between 0 and min(a, b/3)
+  const xMax = Math.min(a, b / 3) * 0.9999;
+  let lo = 0, hi = xMax;
+  for (let i = 0; i < 100; i++) {
+    const mid = (lo + hi) / 2;
+    const n2 = a - mid;
+    const h2 = b - 3 * mid;
+    const nh3 = 2 * mid;
+    if (n2 <= 0 || h2 <= 0) { hi = mid; continue; }
+    const qVal = (nh3 * nh3) / (n2 * Math.pow(h2, 3));
+    if (qVal < Kc) lo = mid; else hi = mid;
+  }
+  const x = (lo + hi) / 2;
+  return {
+    n2eq: Math.max(0, a - x),
+    h2eq: Math.max(0, b - 3 * x),
+    nh3eq: 2 * x,
+    x: x
+  };
+}
+
+function calcQ(a, b, nh3init) {
+  if (a <= 0 || b <= 0) return Infinity;
+  return (nh3init * nh3init) / (a * Math.pow(b, 3));
+}
+
+function calcYield(nh3eq, a, b) {
+  // Theoretical max NH3 from stoichiometry
+  const maxNH3 = 2 * Math.min(a, b / 3);
+  if (maxNH3 <= 0) return 0;
+  return Math.min(100, (nh3eq / maxNH3) * 100);
+}
+
+// ─── SIM STATE ────────────────────────────────────────────────
+let simState = {
+  T: 400, P: 150, n2: 1.0, h2: 3.0,
+  Kc: 0, Q: 0, nh3eq: 0, yield: 0, shift: 'eq'
+};
+let obsCount = 0;
+
+function getSliders() {
+  return {
+    T: parseFloat(document.getElementById('tempSlider').value),
+    P: parseFloat(document.getElementById('pressSlider').value),
+    n2: parseFloat(document.getElementById('n2Slider').value),
+    h2: parseFloat(document.getElementById('h2Slider').value)
+  };
+}
+
+function updateSim() {
+  const s = getSliders();
+  document.getElementById('tempVal').textContent = s.T + ' °C';
+  document.getElementById('pressVal').textContent = s.P + ' atm';
+  document.getElementById('n2Val').textContent = s.n2.toFixed(1) + ' mol/L';
+  document.getElementById('h2Val').textContent = s.h2.toFixed(1) + ' mol/L';
+
+  // Pressure effect: scale Kc by (P factor)
+  // For ideal gas with Kp/Kc conversion; simplified: higher P compresses volume
+  // Effective concentration scale: c_eff = c * (P/150) for pressure factor
+  const pFactor = s.P / 150;
+  const n2eff = s.n2 * pFactor;
+  const h2eff = s.h2 * pFactor;
+
+  const Kc = calcKc(s.T);
+  const eq = calcEquilibrium(Kc, n2eff, h2eff);
+  const Q0 = calcQ(s.n2, s.h2, 0);
+  const yld = calcYield(eq.nh3eq, n2eff, h2eff);
+
+  // Determine shift
+  let shift = 'eq';
+  const qComp = calcQ(s.n2, s.h2, 0.001);
+  if (qComp < Kc) shift = 'right';
+  else if (qComp > Kc * 1.01) shift = 'left';
+
+  simState = { T: s.T, P: s.P, n2: s.n2, h2: s.h2, Kc, Q: qComp, nh3eq: eq.nh3eq, yield: yld, shift };
+
+  document.getElementById('kcDisplay').textContent = Kc < 0.001 ? Kc.toExponential(3) : Kc.toFixed(4);
+  document.getElementById('yieldDisplay').textContent = yld.toFixed(1);
+  document.getElementById('qDisplay').textContent = qComp < 0.001 ? qComp.toExponential(3) : qComp.toFixed(4);
+  document.getElementById('nh3Display').textContent = eq.nh3eq.toFixed(3);
+
+  const badge = document.getElementById('shiftBadge');
+  const qVsKc = document.getElementById('qVsKc');
+  if (shift === 'right') {
+    badge.className = 'shift-badge shift-right';
+    badge.textContent = '→ Shifts Forward (Right)';
+    qVsKc.textContent = 'Q < Kc — reaction proceeds forward to form more NH₃';
+  } else if (shift === 'left') {
+    badge.className = 'shift-badge shift-left';
+    badge.textContent = '← Shifts Backward (Left)';
+    qVsKc.textContent = 'Q > Kc — reaction proceeds backward to form more reactants';
+  } else {
+    badge.className = 'shift-badge shift-eq';
+    badge.textContent = '⇌ At Equilibrium';
+    qVsKc.textContent = 'Q ≈ Kc — system is at equilibrium';
+  }
+
+  updateMolecules(eq.n2eq, eq.h2eq, eq.nh3eq);
+  updateChart(s.P);
+}
+
+function resetSim() {
+  document.getElementById('tempSlider').value = 400;
+  document.getElementById('pressSlider').value = 150;
+  document.getElementById('n2Slider').value = 1.0;
+  document.getElementById('h2Slider').value = 3.0;
+  updateSim();
+}
+
+function applyChange() {
+  obsCount++;
+  const s = simState;
+  const tbody = document.getElementById('obsBody');
+  // Remove empty row
+  const emptyRow = tbody.querySelector('.empty-obs');
+  if (emptyRow) emptyRow.parentElement.remove();
+
+  const shiftText = s.shift === 'right' ? '→ Forward' : s.shift === 'left' ? '← Backward' : '⇌ Equilibrium';
+  const shiftClass = s.shift === 'right' ? 'obs-shift-R' : s.shift === 'left' ? 'obs-shift-L' : '';
+
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td>${obsCount}</td>
+    <td>${s.T}</td>
+    <td>${s.P}</td>
+    <td>${s.n2.toFixed(1)}</td>
+    <td>${s.h2.toFixed(1)}</td>
+    <td>${s.Kc < 0.001 ? s.Kc.toExponential(3) : s.Kc.toFixed(4)}</td>
+    <td><strong>${s.yield.toFixed(1)}%</strong></td>
+    <td>${s.nh3eq.toFixed(3)}</td>
+    <td class="${shiftClass}">${shiftText}</td>
+  `;
+  tbody.appendChild(row);
+
+  // Visual flash on button
+  const btn = event.target;
+  btn.textContent = '✔ Recorded!';
+  btn.style.background = 'linear-gradient(135deg, #2e7d32, #43a047)';
+  setTimeout(() => {
+    btn.textContent = '✅ Apply Change';
+    btn.style.background = '';
+  }, 1200);
+}
+
+function clearObs() {
+  obsCount = 0;
+  const tbody = document.getElementById('obsBody');
+  tbody.innerHTML = '<tr><td colspan="9" class="empty-obs">🔬 No observations yet. Go to <strong>Simulation</strong> and click <strong>Apply Change</strong>.</td></tr>';
+}
+
+// ─── CANVAS ANIMATION ─────────────────────────────────────────
+const canvas = document.getElementById('molCanvas');
+const ctx = canvas.getContext('2d');
+let molecules = [];
+let animId = null;
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = 200;
+}
+
+function createMolecules(n2count, h2count, nh3count) {
+  molecules = [];
+  const W = canvas.width, H = canvas.height;
+  const add = (count, color, r, label) => {
+    for (let i = 0; i < count; i++) {
+      molecules.push({
+        x: Math.random() * (W - 2 * r) + r,
+        y: Math.random() * (H - 2 * r) + r,
+        vx: (Math.random() - 0.5) * 2.4,
+        vy: (Math.random() - 0.5) * 2.4,
+        r, color, label
+      });
+    }
+  };
+  add(n2count, '#4fc3f7', 10, 'N₂');
+  add(h2count, '#b3e5fc', 7, 'H₂');
+  add(nh3count, '#ffb300', 12, 'NH₃');
+}
+
+function updateMolecules(n2eq, h2eq, nh3eq) {
+  const total = 36;
+  const totalConc = n2eq + h2eq + nh3eq + 0.001;
+  const n2c = Math.max(1, Math.round((n2eq / totalConc) * total));
+  const h2c = Math.max(1, Math.round((h2eq / totalConc) * total));
+  const nh3c = Math.max(1, Math.round((nh3eq / totalConc) * total));
+  createMolecules(n2c, h2c, nh3c);
+}
+
+function animateMolecules() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d1b2a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid dots for lab effect
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  for (let gx = 0; gx < W; gx += 20) for (let gy = 0; gy < H; gy += 20) {
+    ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI * 2); ctx.fill();
+  }
+
+  molecules.forEach(m => {
+    m.x += m.vx; m.y += m.vy;
+    if (m.x - m.r < 0) { m.x = m.r; m.vx *= -1; }
+    if (m.x + m.r > W) { m.x = W - m.r; m.vx *= -1; }
+    if (m.y - m.r < 0) { m.y = m.r; m.vy *= -1; }
+    if (m.y + m.r > H) { m.y = H - m.r; m.vy *= -1; }
+
+    // Glow
+    const grd = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 1.8);
+    grd.addColorStop(0, m.color + 'cc');
+    grd.addColorStop(1, m.color + '00');
+    ctx.beginPath(); ctx.arc(m.x, m.y, m.r * 1.8, 0, Math.PI * 2);
+    ctx.fillStyle = grd; ctx.fill();
+
+    // Molecule circle
+    ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+    ctx.fillStyle = m.color; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // Label
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${m.r * 0.75}px Poppins, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(m.label, m.x, m.y);
+  });
+
+  // Equilibrium arrow
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '14px Poppins, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⇌', W / 2, 16);
+
+  animId = requestAnimationFrame(animateMolecules);
+}
+
+// ─── CHART ────────────────────────────────────────────────────
+let yieldChartObj = null;
+
+function buildChartData(pressAtm) {
+  const temps = [];
+  const yields = [];
+  for (let T = 100; T <= 600; T += 20) {
+    const pFactor = pressAtm / 150;
+    const n2e = 1.0 * pFactor, h2e = 3.0 * pFactor;
+    const Kc = calcKc(T);
+    const eq = calcEquilibrium(Kc, n2e, h2e);
+    const yld = calcYield(eq.nh3eq, n2e, h2e);
+    temps.push(T);
+    yields.push(parseFloat(yld.toFixed(2)));
+  }
+  return { temps, yields };
+}
+
+function updateChart(pressAtm) {
+  const { temps, yields } = buildChartData(pressAtm);
+  if (!yieldChartObj) {
+    const chartCtx = document.getElementById('yieldChart').getContext('2d');
+    yieldChartObj = new Chart(chartCtx, {
+      type: 'line',
+      data: {
+        labels: temps,
+        datasets: [{
+          label: `NH₃ Yield % (P = ${pressAtm} atm)`,
+          data: yields,
+          borderColor: '#00897b',
+          backgroundColor: 'rgba(0,137,123,0.12)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#1a237e',
+          pointRadius: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { font: { family: 'Poppins', size: 11 }, color: '#263238' } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` Yield: ${ctx.parsed.y.toFixed(1)}%`
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: 'Temperature (°C)', font: { family: 'Poppins', size: 11 }, color: '#546e7a' },
+            ticks: { font: { family: 'Poppins', size: 10 }, color: '#546e7a' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          },
+          y: {
+            title: { display: true, text: 'NH₃ Yield (%)', font: { family: 'Poppins', size: 11 }, color: '#546e7a' },
+            min: 0, max: 100,
+            ticks: { font: { family: 'Poppins', size: 10 }, color: '#546e7a' },
+            grid: { color: 'rgba(0,0,0,0.05)' }
+          }
+        }
+      }
+    });
+  } else {
+    yieldChartObj.data.labels = temps;
+    yieldChartObj.data.datasets[0].data = yields;
+    yieldChartObj.data.datasets[0].label = `NH₃ Yield % (P = ${pressAtm} atm)`;
+    yieldChartObj.update('none');
+  }
+}
+
+// ─── QUIZ ─────────────────────────────────────────────────────
+let quizAnswers = new Array(5).fill(null);
+const explanations = [
+  'Correct! Increasing temperature in an exothermic reaction shifts equilibrium to the left (reverse), opposing the temperature rise by absorbing heat.',
+  'Incorrect. Le Chatelier\'s Principle states the system shifts to oppose any imposed change.',
+  'Correct! Increasing pressure shifts the reaction toward the side with fewer gas moles. N₂ + 3H₂ → 2NH₃ has 4 moles → 2 moles, so products are favored.',
+  'Correct! Increasing [N₂] creates Q < Kc, so the reaction shifts forward (right) to consume excess N₂ and produce more NH₃.',
+  'Correct! Kc = [NH₃]² / ([N₂][H₂]³) = (mol/L)² / [(mol/L)(mol/L)³] = (mol/L)² / (mol/L)⁴ = L²/mol²'
+];
+
+function answerQ(qIdx, chosen, correct) {
+  if (quizAnswers[qIdx] !== null) return; // Already answered
+  quizAnswers[qIdx] = { chosen, correct };
+
+  const card = document.getElementById('qcard-' + qIdx);
+  const btns = card.querySelectorAll('.option-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === correct) b.classList.add('correct-ans');
+    if (i === chosen && chosen !== correct) b.classList.add('wrong-ans');
+  });
+
+  const fb = document.getElementById('fb-' + qIdx);
+  const isRight = chosen === correct;
+  fb.className = 'feedback-text show ' + (isRight ? 'correct-fb' : 'wrong-fb');
+  fb.textContent = (isRight ? '✔ Correct! ' : '✘ Incorrect. ') + explanations[qIdx];
+
+  const dot = document.getElementById('qdot-' + qIdx);
+  dot.classList.add(isRight ? 'correct' : 'wrong');
+}
+
+function resetQuiz() {
+  quizAnswers = new Array(5).fill(null);
+  for (let i = 0; i < 5; i++) {
+    const card = document.getElementById('qcard-' + i);
+    card.querySelectorAll('.option-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct-ans', 'wrong-ans');
+    });
+    const fb = document.getElementById('fb-' + i);
+    fb.className = 'feedback-text';
+    fb.textContent = '';
+    const dot = document.getElementById('qdot-' + i);
+    dot.className = 'q-dot';
+  }
+  updateResult();
+}
+
+function updateResult() {
+  const answered = quizAnswers.filter(a => a !== null).length;
+  const score = quizAnswers.filter(a => a && a.chosen === a.correct).length;
+
+  if (answered < 5) {
+    document.getElementById('scoreNum').textContent = answered;
+    document.getElementById('resultMsg').textContent = answered === 0 ? 'Complete the quiz first!' : `${answered} / 5 questions answered`;
+    document.getElementById('resultSub').textContent = 'Navigate to the Quiz tab and answer all 5 questions.';
+    document.getElementById('scoreCircle').style.borderColor = '#90a4ae';
+    document.getElementById('scoreCircle').style.color = '#546e7a';
+    document.getElementById('certBox').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('certScore').textContent = score;
+
+  const circle = document.getElementById('scoreCircle');
+  const msg = document.getElementById('resultMsg');
+  const sub = document.getElementById('resultSub');
+  const cert = document.getElementById('certBox');
+
+  if (score >= 4) {
+    circle.style.borderColor = '#2e7d32'; circle.style.color = '#2e7d32';
+    msg.textContent = '🌟 Excellent! Pass with Distinction';
+    sub.textContent = 'Outstanding performance! You have mastered Le Chatelier\'s Principle.';
+    cert.style.display = 'block';
+  } else if (score === 3) {
+    circle.style.borderColor = '#e65100'; circle.style.color = '#e65100';
+    msg.textContent = '👍 Good Job! Pass';
+    sub.textContent = 'You have a good understanding. Review the missed questions for deeper insight.';
+    cert.style.display = 'block';
+  } else {
+    circle.style.borderColor = '#c62828'; circle.style.color = '#c62828';
+    msg.textContent = '📚 Below Pass — Please Retry';
+    sub.textContent = 'Review the Introduction and Simulation sections carefully, then retry the quiz.';
+    cert.style.display = 'none';
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  resizeCanvas();
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    updateSim();
+  });
+  updateSim();
+  animateMolecules();
+});
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DEVELOPER FOOTER — KAILASH N © 2026
+═══════════════════════════════════════════════════════════ -->
+<style>
+  .dev-footer {
+    background: linear-gradient(135deg, #0d1b2a 0%, #1a237e 50%, #00695c 100%);
+    color: #fff;
+    padding: 2.5rem 1rem 1.2rem;
+    text-align: center;
+    margin-top: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .dev-footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ffa000, #00e5ff, #ffa000);
+    animation: shimmer 3s infinite;
+    background-size: 200%;
+  }
+  @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+  .dev-footer .footer-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffa000, #ff6f00);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.9rem; font-weight: 800;
+    color: #fff;
+    margin: 0 auto 0.8rem;
+    box-shadow: 0 0 0 4px rgba(255,160,0,0.3), 0 0 20px rgba(255,160,0,0.2);
+    letter-spacing: -1px;
+    font-family: 'Poppins', sans-serif;
+  }
+  .dev-footer .dev-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+  .dev-footer .dev-title {
+    font-size: 0.82rem;
+    color: #80deea;
+    margin: 0.25rem 0 1.2rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
+  }
+  .dev-footer .social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.4rem;
+  }
+  .dev-footer .social-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .dev-footer .social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    opacity: 0.92;
+  }
+  .dev-footer .social-btn svg {
+    width: 16px; height: 16px; flex-shrink: 0;
+  }
+  .dev-footer .btn-insta1 {
+    background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    color: #fff;
+  }
+  .dev-footer .btn-insta2 {
+    background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+    color: #fff;
+  }
+  .dev-footer .btn-linkedin {
+    background: #0077b5;
+    color: #fff;
+  }
+  .dev-footer .btn-github {
+    background: #24292e;
+    color: #fff;
+    border: 1px solid #444;
+  }
+  .dev-footer .btn-whatsapp {
+    background: #25d366;
+    color: #fff;
+  }
+  .dev-footer .footer-divider {
+    width: 60px; height: 2px;
+    background: rgba(255,255,255,0.2);
+    margin: 0 auto 1rem;
+    border-radius: 2px;
+  }
+  .dev-footer .copyright {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    line-height: 1.8;
+  }
+  .dev-footer .copyright span {
+    color: #ffa000;
+    font-weight: 600;
+  }
+</style>
+
+<footer class="dev-footer">
+  <div class="footer-avatar">KN</div>
+  <p class="dev-name">KAILASH N</p>
+  <p class="dev-title">Developer &amp; Designer</p>
+
+  <div class="social-links">
+
+    <!-- Instagram 1 -->
+    <a href="https://instagram.com/reloading_clan" target="_blank" rel="noopener" class="social-btn btn-insta1" title="@reloading_clan">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.333.013 7.053.072 5.773.131 4.548.425 3.465 1.508 2.382 2.591 2.088 3.816 2.029 5.096 1.97 6.376 1.957 6.784 1.957 12s.013 5.624.072 6.904c.059 1.28.353 2.505 1.436 3.588 1.083 1.083 2.308 1.377 3.588 1.436C8.333 23.987 8.741 24 12 24s3.667-.013 4.947-.072c1.28-.059 2.505-.353 3.588-1.436 1.083-1.083 1.377-2.308 1.436-3.588.059-1.28.072-1.688.072-6.904s-.013-5.624-.072-6.904c-.059-1.28-.353-2.505-1.436-3.588C19.452.425 18.227.131 16.947.072 15.667.013 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      @reloading_clan
+    </a>
+
+    <!-- Instagram 2 -->
+    <a href="https://instagram.com/kailash_.kanth_.pvt" target="_blank" rel="noopener" class="social-btn btn-insta2" title="@kailash_.kanth_.pvt">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.334 3.608 1.308.975.975 1.246 2.242 1.308 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.334 2.633-1.308 3.608-.975.975-2.242 1.246-3.608 1.308-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.334-3.608-1.308-.975-.975-1.246-2.242-1.308-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.334-2.633 1.308-3.608.975-.975 2.242-1.246 3.608-1.308C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.333.013 7.053.072 5.773.131 4.548.425 3.465 1.508 2.382 2.591 2.088 3.816 2.029 5.096 1.97 6.376 1.957 6.784 1.957 12s.013 5.624.072 6.904c.059 1.28.353 2.505 1.436 3.588 1.083 1.083 2.308 1.377 3.588 1.436C8.333 23.987 8.741 24 12 24s3.667-.013 4.947-.072c1.28-.059 2.505-.353 3.588-1.436 1.083-1.083 1.377-2.308 1.436-3.588.059-1.28.072-1.688.072-6.904s-.013-5.624-.072-6.904c-.059-1.28-.353-2.505-1.436-3.588C19.452.425 18.227.131 16.947.072 15.667.013 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zm0 10.162a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+      @kailash_.kanth_.pvt
+    </a>
+
+    <!-- LinkedIn -->
+    <a href="https://www.linkedin.com/in/kailashkanth" target="_blank" rel="noopener" class="social-btn btn-linkedin" title="LinkedIn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      kailashkanth
+    </a>
+
+    <!-- GitHub -->
+    <a href="https://github.com/kailashnatarajan" target="_blank" rel="noopener" class="social-btn btn-github" title="GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      kailashnatarajan
+    </a>
+
+    <!-- WhatsApp -->
+    <a href="https://wa.me/918489091701" target="_blank" rel="noopener" class="social-btn btn-whatsapp" title="WhatsApp">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+      +91 84890 91701
+    </a>
+
+  </div>
+
+  <div class="footer-divider"></div>
+  <p class="copyright">
+    &copy; 2026 <span>KAILASH N</span>. All Rights Reserved.<br>
+    Virtual Chemistry Laboratory &mdash; Le Chatelier's Principle<br>
+    Developed for Academic Purpose &nbsp;|&nbsp; B.Sc / B.Tech Chemistry
+  </p>
+</footer>
+
+</body>
+</html>
