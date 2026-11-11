@@ -9,7 +9,7 @@ Thank you for your interest in contributing! This project is maintained by **Kai
 ### 1. Fork & Clone
 ```bash
 # Fork the repo on GitHub, then:
-git clone https://github.com/<your-username>/chemistry-virtual-lab.git
+git clone https://github.com/kailashnatarajan/chemistry-virtual-lab.git
 cd chemistry-virtual-lab
 ```
 
@@ -90,7 +90,7 @@ chemistry-virtual-lab/
 ## 🐛 Reporting Bugs
 
 Open an issue at:  
-👉 https://github.com/kailashnatarajan/chemistry-virtual-lab/issues
+👉 https://github.com/kailashnatarajan/chemical-equilibrium/issues
 
 Include:
 - Browser + version
